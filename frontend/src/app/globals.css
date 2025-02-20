@@ -1,0 +1,8 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Smooth transitions for dark mode */
+html {
+  @apply transition-colors duration-300;
+}
