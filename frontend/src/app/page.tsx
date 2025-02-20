@@ -1,5 +1,5 @@
-// app/page.tsx
 "use client";
+import axios from 'axios';
 import { useState } from 'react';
 import { FaSun, FaMoon, FaTrash, FaPlus } from 'react-icons/fa';
 
@@ -22,8 +22,9 @@ export default function Home() {
   const addTodo = (e: React.FormEvent) => {
     e.preventDefault();
     if (input.trim()) {
-      setTodos([...todos, { id: Date.now(), text: input.trim(), completed: false }]);
-      setInput('');
+      axios.post('http://localhost:3001/addTodo', { task: input.trim() })
+        .then((res) => console.log(res))
+        .catch((err) => console.log(err));
     }
   };
 
