@@ -20,7 +20,7 @@ export default function Home() {
   const [editingTask, setEditingTask] = useState('');
 
   const getData = () => {
-    axios.get('http://localhost:3001/getTodo')
+    axios.get(`${API_URL}/getTodo`)
       .then((data) => setTodos(data.data.data));
   }
 
