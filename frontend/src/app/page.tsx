@@ -59,7 +59,7 @@ export default function Home() {
 
       axios.put('http://localhost:3001/editTodo', {
         _id: currentTodoId,
-        updatedTask: editingTask
+        updatedTask: editingTask.toUpperCase()
       })
         .then((res) => {
           console.log(res)
