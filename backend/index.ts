@@ -35,7 +35,7 @@ app.post('/addTodo', async (req: Request, res: Response) => {
         });
         await newTask.save();
 
-        res.status(201).json({ message: "Task added successfully", task: newTask });
+        res.status(200).json({ message: "Task added successfully", task: newTask });
     } catch (error: any) {
         console.log(error);
         res.status(500).json({ message: "Internal Server Error" });
@@ -44,3 +44,25 @@ app.post('/addTodo', async (req: Request, res: Response) => {
 
 
 
+app.get('/getTodo', async (req: Request, res: Response) => {
+    try {
+        const todos = await Todo.find({});
+        res.status(201).json({ data: todos });
+    } catch (error: any) {
+        console.log(error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+})
+
+
+
+app.delete('/delTodo', async (req: Request, res: Response) => {
+    try {
+        const { _id } = req.body;
+        await Todo.findByIdAndDelete(_id);  
+
+        res.status(200).json({ mesage: 'Todo Deleted' });
+    } catch (error) {
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+})

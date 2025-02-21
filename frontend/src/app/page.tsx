@@ -1,18 +1,28 @@
 "use client";
 import axios from 'axios';
-import { useState } from 'react';
-import { FaSun, FaMoon, FaTrash, FaPlus } from 'react-icons/fa';
+import { useEffect, useState } from 'react';
+import { FaSun, FaMoon, FaTrash, FaPlus, FaCheck } from 'react-icons/fa';
 
 interface Todo {
-  id: number;
-  text: string;
-  completed: boolean;
+  _id: number;
+  task: string;
 }
 
 export default function Home() {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [input, setInput] = useState('');
   const [isDarkMode, setIsDarkMode] = useState(false);
+
+
+  const getData = () => {
+    axios.get('http://localhost:3001/getTodo')
+      .then((data) => setTodos(data.data.data));
+  }
+
+  useEffect(() => {
+    getData();
+  }, [])
+
 
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode);
@@ -22,76 +32,104 @@ export default function Home() {
   const addTodo = (e: React.FormEvent) => {
     e.preventDefault();
     if (input.trim()) {
-      axios.post('http://localhost:3001/addTodo', { task: input.trim() })
-        .then((res) => console.log(res))
+      axios.post('http://localhost:3001/addTodo', { task: input.trim().toUpperCase() })
+        .then((res) => {
+          console.log(res)
+          getData();
+        })
         .catch((err) => console.log(err));
     }
   };
 
   const deleteTodo = (id: number) => {
-    setTodos(todos.filter(todo => todo.id !== id));
-  };
-
-  const toggleComplete = (id: number) => {
-    setTodos(todos.map(todo =>
-      todo.id === id ? { ...todo, completed: !todo.completed } : todo
-    ));
+    axios.delete('http://localhost:3001/delTodo', { data: { _id: id } })
+      .then((res) => {
+        console.log(res)
+        getData();
+      })
+      .catch((err) => console.log(err));
   };
 
   return (
-    <div className={`w-screen min-h-screen transition-colors duration-300 ${isDarkMode ? 'dark' : ''}`}>
-      <div className="w-screen mx-auto px-96 py-4 min-h-screen dark:bg-slate-900 dark:text-white">
-        <div className="flex justify-between items-center mb-8 w-full">
-          <h1 className="text-3xl font-bold">Todo App</h1>
+    <div className={`min-h-screen transition-all w-full bg-gradient-to-br duration-500 ${isDarkMode ? 'dark from-slate-800 to-slate-900' : 'from-blue-50 to-purple-50'}`}>
+      <div className={`min-h-screen mx-auto max-w-4xl px-4 py-8`}>
+
+        {/* Header Section */}
+        <header className="flex justify-between items-center mb-12">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-500 bg-clip-text text-transparent">
+            Todo Magic
+          </h1>
           <button
             onClick={toggleTheme}
-            className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors"
+            className={`p-3 rounded-full shadow-lg transition-all duration-300 ${isDarkMode
+              ? 'bg-slate-700 hover:bg-slate-600 text-amber-300'
+              : 'bg-white hover:bg-blue-50 text-blue-600'
+              }`}
           >
             {isDarkMode ? <FaSun size={24} /> : <FaMoon size={24} />}
           </button>
-        </div>
+        </header>
 
-        <form onSubmit={addTodo} className="flex gap-2 mb-8">
-          <input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Add a new todo..."
-            className="flex-1 p-2 rounded-lg border dark:border-slate-700 dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <button
-            type="submit"
-            className="p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center gap-2"
-          >
-            <FaPlus /> Add
-          </button>
+        {/* Add Todo Form */}
+        <form onSubmit={addTodo} className="group relative mb-12">
+          <div className="flex gap-4 transition-all duration-300 focus-within:scale-[1.02]">
+            <input
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="What needs to be done?"
+              className={`uppercase font-bold flex-1 p-4 text-lg rounded-xl shadow-md transition-all duration-300 focus:outline-none focus:ring-4 ${isDarkMode
+                ? 'bg-slate-700 text-white focus:ring-purple-500/50 placeholder-slate-400'
+                : 'bg-white text-slate-800 focus:ring-blue-500/30 placeholder-slate-400'
+                }`}
+            />
+            <button
+              type="submit"
+              className={`p-4 px-6 rounded-xl font-semibold transition-all duration-300 flex items-center gap-2 shadow-md hover:shadow-lg ${isDarkMode
+                ? 'bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500'
+                : 'bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-400 hover:to-purple-400 text-white'
+                }`}
+            >
+              <FaPlus size={20} />
+            </button>
+          </div>
         </form>
 
-        <div className="space-y-2">
+        {/* Todo List */}
+        <div className="space-y-3">
           {todos.map(todo => (
             <div
-              key={todo.id}
-              className="flex items-center justify-between p-4 rounded-lg bg-white dark:bg-slate-800 shadow-sm hover:shadow-md transition-shadow"
+              key={todo._id}
+              className={`group flex items-center justify-between p-5 rounded-xl transition-all duration-300 ${isDarkMode
+                ? 'bg-slate-700 hover:bg-slate-650'
+                : 'bg-white hover:bg-blue-50'
+                } shadow-md hover:shadow-lg`}
             >
-              <div className="flex items-center gap-3">
-                <input
-                  type="checkbox"
-                  checked={todo.completed}
-                  onChange={() => toggleComplete(todo.id)}
-                  className="w-4 h-4 text-blue-500 rounded focus:ring-blue-500"
-                />
-                <span className={`${todo.completed ? 'line-through text-gray-400' : ''}`}>
-                  {todo.text}
+              <div className="flex items-center gap-4 flex-1">
+                <span className={`text-lg transition-all duration-300 text-slate-700 dark:text-slate-200`}>
+                  {todo.task}
                 </span>
               </div>
               <button
-                onClick={() => deleteTodo(todo.id)}
-                className="text-red-500 hover:text-red-600 p-2 rounded-full hover:bg-red-100 dark:hover:bg-slate-700 transition-colors"
+                onClick={() => deleteTodo(todo._id)}
+                className={`p-2 rounded-lg opacity-70 hover:opacity-100 transition-all duration-300 ${isDarkMode
+                  ? 'hover:bg-slate-600'
+                  : 'hover:bg-red-100'
+                  }`}
               >
-                <FaTrash />
+                <FaTrash className={`text-red-500 ${isDarkMode ? 'text-red-400' : 'text-red-500'}`} />
               </button>
             </div>
           ))}
+
+          {/* Empty State */}
+          {todos.length === 0 && (
+            <div className="text-center py-12">
+              <p className="text-xl text-slate-400 dark:text-slate-600">
+                ✨ Your todo list is sparkling clean!
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </div>
