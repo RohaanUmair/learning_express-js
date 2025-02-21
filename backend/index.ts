@@ -66,3 +66,16 @@ app.delete('/delTodo', async (req: Request, res: Response) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 })
+
+
+
+app.put('/editTodo', async (req: Request, res: Response) => {
+    try {
+        const { _id, updatedTask } = req.body;
+        await Todo.findByIdAndUpdate(_id, { task: updatedTask });
+
+        res.json({ message: 'Todo Edited' });
+    } catch (error) {
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+})

@@ -1,6 +1,7 @@
 "use client";
 import axios from 'axios';
 import { useEffect, useState } from 'react';
+import { BiEdit } from 'react-icons/bi';
 import { FaSun, FaMoon, FaTrash, FaPlus, FaCheck } from 'react-icons/fa';
 
 interface Todo {
@@ -12,7 +13,9 @@ export default function Home() {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [input, setInput] = useState('');
   const [isDarkMode, setIsDarkMode] = useState(false);
-
+  // New states for editing
+  const [editingTodoId, setEditingTodoId] = useState<number | null>(null);
+  const [editingTask, setEditingTask] = useState('');
 
   const getData = () => {
     axios.get('http://localhost:3001/getTodo')
@@ -22,7 +25,6 @@ export default function Home() {
   useEffect(() => {
     getData();
   }, [])
-
 
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode);
@@ -37,7 +39,8 @@ export default function Home() {
           console.log(res)
           getData();
         })
-        .catch((err) => console.log(err));
+        .catch((err) => console.log(err))
+        .finally(() => setInput(''));
     }
   };
 
@@ -49,6 +52,27 @@ export default function Home() {
       })
       .catch((err) => console.log(err));
   };
+
+  const editTodo = (currentTodoId: number, currentTodoText: string) => {
+    if (editingTodoId === currentTodoId) {
+      if (editingTask.trim() == '') return;
+
+      axios.put('http://localhost:3001/editTodo', {
+        _id: currentTodoId,
+        updatedTask: editingTask
+      })
+        .then((res) => {
+          console.log(res)
+          getData()
+        })
+        .catch((err) => console.log(err));
+
+      setEditingTodoId(null);
+    } else {
+      setEditingTodoId(currentTodoId);
+      setEditingTask(currentTodoText);
+    }
+  }
 
   return (
     <div className={`min-h-screen transition-all w-full bg-gradient-to-br duration-500 ${isDarkMode ? 'dark from-slate-800 to-slate-900' : 'from-blue-50 to-purple-50'}`}>
@@ -78,7 +102,7 @@ export default function Home() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="What needs to be done?"
-              className={`uppercase font-bold flex-1 p-4 text-lg rounded-xl shadow-md transition-all duration-300 focus:outline-none focus:ring-4 ${isDarkMode
+              className={`uppercase font-semibold flex-1 p-4 text-lg rounded-xl shadow-md transition-all duration-300 focus:outline-none focus:ring-4 ${isDarkMode
                 ? 'bg-slate-700 text-white focus:ring-purple-500/50 placeholder-slate-400'
                 : 'bg-white text-slate-800 focus:ring-blue-500/30 placeholder-slate-400'
                 }`}
@@ -106,10 +130,37 @@ export default function Home() {
                 } shadow-md hover:shadow-lg`}
             >
               <div className="flex items-center gap-4 flex-1">
-                <span className={`text-lg transition-all duration-300 text-slate-700 dark:text-slate-200`}>
-                  {todo.task}
-                </span>
+                {editingTodoId === todo._id ? (
+                  <input
+                    type="text"
+                    value={editingTask}
+                    onChange={(e) => setEditingTask(e.target.value)}
+                    className={`uppercase font-semibold flex-1 p-2 text-lg rounded-xl shadow-md transition-all duration-300 focus:outline-none ${isDarkMode
+                      ? 'bg-slate-700 text-white'
+                      : 'bg-white text-slate-800'
+                      }`}
+                  />
+                ) : (
+                  <span className="text-lg font-semibold transition-all duration-300 text-slate-700 dark:text-slate-200">
+                    {todo.task}
+                  </span>
+                )}
               </div>
+
+              <button
+                onClick={() => editTodo(todo._id, todo.task)}
+                className={`p-2 rounded-lg opacity-70 hover:opacity-100 transition-all duration-300 ${isDarkMode
+                  ? 'hover:bg-slate-600'
+                  : 'hover:bg-green-100'
+                  }`}
+              >
+                {editingTodoId === todo._id ? (
+                  <FaCheck className={`text-xl ${isDarkMode ? 'text-green-400' : 'text-green-500'}`} />
+                ) : (
+                  <BiEdit className={`text-xl ${isDarkMode ? 'text-green-400' : 'text-green-500'}`} />
+                )}
+              </button>
+
               <button
                 onClick={() => deleteTodo(todo._id)}
                 className={`p-2 rounded-lg opacity-70 hover:opacity-100 transition-all duration-300 ${isDarkMode
