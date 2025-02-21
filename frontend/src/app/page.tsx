@@ -10,6 +10,8 @@ interface Todo {
 }
 
 export default function Home() {
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
   const [todos, setTodos] = useState<Todo[]>([]);
   const [input, setInput] = useState('');
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -34,7 +36,7 @@ export default function Home() {
   const addTodo = (e: React.FormEvent) => {
     e.preventDefault();
     if (input.trim()) {
-      axios.post('http://localhost:3001/addTodo', { task: input.trim().toUpperCase() })
+      axios.post(`${API_URL}/addTodo`, { task: input.trim().toUpperCase() })
         .then((res) => {
           console.log(res)
           getData();
@@ -45,7 +47,7 @@ export default function Home() {
   };
 
   const deleteTodo = (id: number) => {
-    axios.delete('http://localhost:3001/delTodo', { data: { _id: id } })
+    axios.delete(`${API_URL}/delTodo`, { data: { _id: id } })
       .then((res) => {
         console.log(res)
         getData();
@@ -57,7 +59,7 @@ export default function Home() {
     if (editingTodoId === currentTodoId) {
       if (editingTask.trim() == '') return;
 
-      axios.put('http://localhost:3001/editTodo', {
+      axios.put(`${API_URL}/editTodo`, {
         _id: currentTodoId,
         updatedTask: editingTask.toUpperCase()
       })
