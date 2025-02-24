@@ -1,7 +1,31 @@
+'use client';
+import axios from 'axios';
 import Link from 'next/link'
-import React from 'react'
+import React, { FormEvent, useState } from 'react'
+import toast, { Toaster } from 'react-hot-toast';
 
 export default function page() {
+    const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
+    const [loginEmail, setLoginEmail] = useState<string>('');
+    const [loginPassword, setLoginPassword] = useState<string>('');
+
+
+    const handleLogin = (e: FormEvent) => {
+        e.preventDefault();
+
+        axios.post(`${API_URL}/loginUser`, { email: loginEmail, password: loginPassword }, { withCredentials: true })
+            .then((res) => {
+                console.log(res);
+                toast.success(res.data.message);
+            })
+            .catch((err) => {
+                toast.error(err.response.data.message);
+                console.log(err.response.data.message);
+            })
+    };;
+
+
     return (
         <section className="bg-gray-50 dark:bg-gray-900">
             <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
@@ -15,7 +39,8 @@ export default function page() {
                         <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
                             Sign in to your account
                         </h1>
-                        <form className="space-y-4 md:space-y-6">
+
+                        <form onSubmit={handleLogin} className="space-y-4 md:space-y-6">
                             <div>
                                 <label
                                     htmlFor="email"
@@ -24,6 +49,8 @@ export default function page() {
                                     Your email
                                 </label>
                                 <input
+                                    value={loginEmail}
+                                    onChange={(e) => setLoginEmail(e.target.value)}
                                     type="email"
                                     name="email"
                                     id="email"
@@ -40,6 +67,8 @@ export default function page() {
                                     Password
                                 </label>
                                 <input
+                                    value={loginPassword}
+                                    onChange={(e) => setLoginPassword(e.target.value)}
                                     type="password"
                                     name="password"
                                     id="password"
@@ -56,7 +85,6 @@ export default function page() {
                                             aria-describedby="remember"
                                             type="checkbox"
                                             className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-primary-600 dark:ring-offset-gray-800"
-                                            required={true}
                                         />
                                     </div>
                                     <div className="ml-3 text-sm">
@@ -82,7 +110,7 @@ export default function page() {
                                 Sign in
                             </button>
                             <p className="text-sm font-light text-gray-500 dark:text-gray-400">
-                                Dont have an account?  
+                                Dont have an account?
                                 <Link className='font-medium text-primary-600 hover:underline dark:text-primary-500' href={'/signup'}>
                                     Create now
                                 </Link>
@@ -91,6 +119,8 @@ export default function page() {
                     </div>
                 </div>
             </div>
+
+            <Toaster />
         </section>
 
     )

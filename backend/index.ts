@@ -4,6 +4,8 @@ import { connectToDb } from "./lib/mongoDb";
 import User from "./models/UserSchema";
 const cors = require('cors');
 import bcrypt from "bcrypt";
+const jwt = require('jsonwebtoken');
+const cookieParser = require('cookie-parser')
 
 
 
@@ -11,16 +13,18 @@ const app = express();
 app.use(cors({
     origin: process.env.CLIENT_URL || "http://localhost:3000",
     methods: "GET,POST,PUT,DELETE",
-    allowedHeaders: "Content-Type"
+    allowedHeaders: "Content-Type",
+    credentials: true
 }));
 app.use(express.json());
+app.use(cookieParser);
 
 async function connect() {
     try {
         await connectToDb();
 
         app.listen(3001, () => {
-            console.log('Server is running')
+            console.log('Server is running');
         });
     } catch (error: any) {
         console.log(error)
@@ -48,6 +52,16 @@ app.post('/addTodo', async (req: Request, res: Response) => {
 
 app.get('/getTodo', async (req: Request, res: Response) => {
     try {
+        const cookie = req.cookies['jwt'];
+        
+        const claims = jwt.verify(cookie, process.env.JWT_SECRET);
+
+        if (!claims) {
+            res.status(401).json({ message: 'Unauthenticated' });
+            return;
+        }
+        
+
         const todos = await Todo.find({});
         res.status(201).json({ data: todos });
     } catch (error: any) {
@@ -108,5 +122,36 @@ app.post('/signupUser', async (req: Request, res: Response) => {
         res.status(201).json({ message: 'Account Created Successfully!' });
     } catch (error) {
         res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+
+app.post('/loginUser', async (req: Request, res: Response) => {
+    try {
+        const { email, password } = req.body;
+
+        const userExistence = await User.findOne({ email });
+
+        if (!userExistence) {
+            res.status(400).json({ message: 'User does not Exist' });
+            return;
+        }
+
+        if (!await bcrypt.compare(password, userExistence.password)) {
+            res.status(400).json({ message: 'Invalid Password' });
+            return;
+        }
+
+        const token = jwt.sign({ _id: userExistence._id }, process.env.JWT_SECRET);
+
+        res.cookie('jwt', token, {
+            httpOnly: true,
+            sameSite: 'none',
+            maxAge: 1000 * 60 * 60
+        });
+
+        res.status(200).json({ message: 'Logged In Successfully' });
+    } catch (error) {
+        res.status(500).json({ error: 'Internal Sevrer Error' });
     }
 });
