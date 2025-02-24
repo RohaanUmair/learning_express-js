@@ -5,8 +5,11 @@ import User from "./models/UserSchema";
 const cors = require('cors');
 import bcrypt from "bcrypt";
 const jwt = require('jsonwebtoken');
-const cookieParser = require('cookie-parser')
+const cookieParser = require('cookie-parser');
+import dotenv from 'dotenv';
 
+
+dotenv.config({ path: ".env.local" });
 
 
 const app = express();
@@ -17,7 +20,7 @@ app.use(cors({
     credentials: true
 }));
 app.use(express.json());
-app.use(cookieParser);
+app.use(cookieParser());
 
 async function connect() {
     try {
@@ -35,15 +38,30 @@ connect();
 
 app.post('/addTodo', async (req: Request, res: Response) => {
     try {
+        const cookie = req.cookies['jwt'];
+        console.log(cookie)
+
+        const claims = jwt.verify(cookie, process.env.JWT_SECRET);
+        console.log(claims)
+
+
+        if (!claims) {
+            res.status(401).json({ message: 'Unauthenticated' });
+            return;
+        }
+
+
         const { task } = req.body;
         const newTask = new Todo({
-            task
+            task,
+            userId: claims._id
         });
         await newTask.save();
 
         res.status(200).json({ message: "Task added successfully", task: newTask });
     } catch (error: any) {
         console.log(error);
+
         res.status(500).json({ message: "Internal Server Error" });
     }
 });
@@ -53,16 +71,18 @@ app.post('/addTodo', async (req: Request, res: Response) => {
 app.get('/getTodo', async (req: Request, res: Response) => {
     try {
         const cookie = req.cookies['jwt'];
-        
+        console.log(cookie)
+
         const claims = jwt.verify(cookie, process.env.JWT_SECRET);
+        console.log(claims)
+
 
         if (!claims) {
             res.status(401).json({ message: 'Unauthenticated' });
             return;
         }
-        
 
-        const todos = await Todo.find({});
+        const todos = await Todo.find({ userId: claims._id });
         res.status(201).json({ data: todos });
     } catch (error: any) {
         console.log(error);
@@ -146,7 +166,7 @@ app.post('/loginUser', async (req: Request, res: Response) => {
 
         res.cookie('jwt', token, {
             httpOnly: true,
-            sameSite: 'none',
+            sameSite: 'lax',
             maxAge: 1000 * 60 * 60
         });
 

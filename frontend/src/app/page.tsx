@@ -21,7 +21,7 @@ export default function Home() {
 
   const getData = () => {
     setIsLoading(true);
-    return axios.get(`${API_URL}/getTodo`)
+    return axios.get(`${API_URL}/getTodo`, { withCredentials: true })
       .then((data) => setTodos(data.data.data))
       .catch((err) => {
         toast.error('Failed to fetch todos');
@@ -44,7 +44,7 @@ export default function Home() {
     if (input.trim()) {
       const task = input.trim().toUpperCase();
       const toastId = toast.loading('Adding todo...');
-      axios.post(`${API_URL}/addTodo`, { task })
+      axios.post(`${API_URL}/addTodo`, { task }, { withCredentials: true })
         .then(() => getData())
         .then(() => toast.success('Todo added successfully!', { id: toastId }))
         .catch((error) => {
