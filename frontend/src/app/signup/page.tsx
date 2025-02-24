@@ -1,7 +1,31 @@
+'use client'
+import axios from 'axios';
 import Link from 'next/link'
-import React from 'react'
+import React, { FormEvent, useState } from 'react'
+import toast, { Toaster } from 'react-hot-toast';
 
 export default function page() {
+    const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
+    const [signupUsername, setSignupUsername] = useState<string>('');
+    const [signupEmail, setSignupEmail] = useState<string>('');
+    const [signupPassword, setSignupPassword] = useState<string>('');
+
+
+    const handleFormSubmit = (e: FormEvent) => {
+        e.preventDefault();
+
+        axios.post(`${API_URL}/signupUser`, { username: signupUsername, email: signupEmail, password: signupPassword })
+            .then((res) => {
+                console.log(res);
+            })
+            .catch((err) => {
+                toast.error(err.response.data.message);
+                console.log(err.response.data.message);
+            })
+    };
+
+
     return (
         <section className="bg-gray-50 dark:bg-gray-900">
             <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
@@ -15,7 +39,8 @@ export default function page() {
                         <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
                             Sign Up
                         </h1>
-                        <form className="space-y-4 md:space-y-6" action="#">
+
+                        <form onSubmit={handleFormSubmit} className="space-y-4 md:space-y-6">
                             <div>
                                 <label
                                     htmlFor="username"
@@ -30,6 +55,8 @@ export default function page() {
                                     className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                     placeholder="Username"
                                     required={true}
+                                    value={signupUsername}
+                                    onChange={(e) => setSignupUsername(e.target.value)}
                                 />
                             </div>
                             <div>
@@ -46,6 +73,8 @@ export default function page() {
                                     className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                     placeholder="email@email.com"
                                     required={true}
+                                    value={signupEmail}
+                                    onChange={(e) => setSignupEmail(e.target.value)}
                                 />
                             </div>
                             <div>
@@ -62,6 +91,8 @@ export default function page() {
                                     placeholder="••••••••"
                                     className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                     required={true}
+                                    value={signupPassword}
+                                    onChange={(e) => setSignupPassword(e.target.value)}
                                 />
                             </div>
                             <button
@@ -80,6 +111,8 @@ export default function page() {
                     </div>
                 </div>
             </div>
+
+            <Toaster />
         </section>
 
     )

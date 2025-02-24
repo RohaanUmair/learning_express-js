@@ -1,13 +1,15 @@
 import express, { Request, Response } from "express";
-import mongoose from "mongoose";
 import Todo from "./models/TodoSchema";
 import { connectToDb } from "./lib/mongoDb";
+import User from "./models/UserSchema";
 const cors = require('cors');
+import bcrypt from "bcrypt";
+
 
 
 const app = express();
 app.use(cors({
-    origin: process.env.CLIENT_URL || "http://localhost:3001",
+    origin: process.env.CLIENT_URL || "http://localhost:3000",
     methods: "GET,POST,PUT,DELETE",
     allowedHeaders: "Content-Type"
 }));
@@ -59,7 +61,7 @@ app.get('/getTodo', async (req: Request, res: Response) => {
 app.delete('/delTodo', async (req: Request, res: Response) => {
     try {
         const { _id } = req.body;
-        await Todo.findByIdAndDelete(_id);  
+        await Todo.findByIdAndDelete(_id);
 
         res.status(200).json({ mesage: 'Todo Deleted' });
     } catch (error) {
@@ -78,4 +80,33 @@ app.put('/editTodo', async (req: Request, res: Response) => {
     } catch (error) {
         res.status(500).json({ error: 'Internal Server Error' });
     }
-})
+});
+
+
+
+
+app.post('/signupUser', async (req: Request, res: Response) => {
+    try {
+        const { username, email, password } = req.body;
+
+        const userExistence = await User.findOne({ email });
+        if (userExistence) {
+            res.status(400).json({ message: 'User with this Email already exists' });
+            return;
+        };
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        const user = new User({
+            username,
+            email,
+            password: hashedPassword
+        });
+
+        await user.save();
+
+        res.status(201).json({ message: 'Account Created Successfully!' });
+    } catch (error) {
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
