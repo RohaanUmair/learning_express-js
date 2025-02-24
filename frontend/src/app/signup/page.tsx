@@ -1,6 +1,7 @@
 'use client'
 import axios from 'axios';
 import Link from 'next/link'
+import { useRouter } from 'next/navigation';
 import React, { FormEvent, useState } from 'react'
 import toast, { Toaster } from 'react-hot-toast';
 
@@ -11,6 +12,8 @@ export default function page() {
     const [signupEmail, setSignupEmail] = useState<string>('');
     const [signupPassword, setSignupPassword] = useState<string>('');
 
+    const router = useRouter();
+
 
     const handleFormSubmit = (e: FormEvent) => {
         e.preventDefault();
@@ -18,6 +21,7 @@ export default function page() {
         axios.post(`${API_URL}/signupUser`, { username: signupUsername, email: signupEmail, password: signupPassword })
             .then((res) => {
                 console.log(res);
+                router.push('/login');
             })
             .catch((err) => {
                 toast.error(err.response.data.message);
@@ -75,6 +79,7 @@ export default function page() {
                                     required={true}
                                     value={signupEmail}
                                     onChange={(e) => setSignupEmail(e.target.value)}
+                                    // minLength={6}
                                 />
                             </div>
                             <div>
@@ -93,6 +98,7 @@ export default function page() {
                                     required={true}
                                     value={signupPassword}
                                     onChange={(e) => setSignupPassword(e.target.value)}
+                                    // minLength={6}
                                 />
                             </div>
                             <button

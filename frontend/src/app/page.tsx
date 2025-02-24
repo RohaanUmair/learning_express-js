@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { BiEdit } from 'react-icons/bi';
 import { FaSun, FaMoon, FaTrash, FaPlus, FaCheck } from 'react-icons/fa';
 import toast, { Toaster } from 'react-hot-toast';
+import { useRouter } from 'next/navigation';
 
 interface Todo {
   _id: number;
@@ -18,6 +19,7 @@ export default function Home() {
   const [editingTodoId, setEditingTodoId] = useState<number | null>(null);
   const [editingTask, setEditingTask] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
 
   const getData = () => {
     setIsLoading(true);
@@ -87,6 +89,15 @@ export default function Home() {
     }
   }
 
+  const handleLogout = () => {
+    axios.post(`${API_URL}/logout`, {}, { withCredentials: true })
+      .then((res) => {
+        console.log(res);
+        // router.push('/login');
+      })
+      .catch((err) => console.log(err));
+  };
+
   return (
     <div className={`min-h-screen transition-all w-full bg-gradient-to-br duration-500 ${isDarkMode ? 'dark from-slate-800 to-slate-900' : 'from-blue-50 to-purple-50'}`}>
       <Toaster
@@ -98,6 +109,11 @@ export default function Home() {
           },
         }}
       />
+
+      <button onClick={handleLogout} className={`p-3 px-6 rounded-sm font-semibold transition-all duration-300 absolute text-white right-10 top-4 shadow-md hover:shadow-lg ${isDarkMode
+        ? 'bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500'
+        : 'bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-400 hover:to-purple-400 text-white'
+        }`}>Logout</button>
 
       <div className={`min-h-screen mx-auto max-w-4xl px-4 py-8`}>
         {/* Header Section */}

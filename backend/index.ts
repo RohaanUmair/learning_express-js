@@ -123,11 +123,18 @@ app.post('/signupUser', async (req: Request, res: Response) => {
     try {
         const { username, email, password } = req.body;
 
+        if(username.length < 4){
+            res.status(400).json({ message: 'User with this Email already exists' });
+            return;
+        }
+
         const userExistence = await User.findOne({ email });
         if (userExistence) {
             res.status(400).json({ message: 'User with this Email already exists' });
             return;
         };
+
+
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -149,6 +156,8 @@ app.post('/signupUser', async (req: Request, res: Response) => {
 app.post('/loginUser', async (req: Request, res: Response) => {
     try {
         const { email, password } = req.body;
+
+
 
         const userExistence = await User.findOne({ email });
 
@@ -174,4 +183,12 @@ app.post('/loginUser', async (req: Request, res: Response) => {
     } catch (error) {
         res.status(500).json({ error: 'Internal Sevrer Error' });
     }
+});
+
+
+
+app.post('/logout', (req: Request, res: Response) => {
+    res.cookie('jwt', '', { maxAge: 0 });
+
+    res.json({ message: 'Logged out' });
 });
