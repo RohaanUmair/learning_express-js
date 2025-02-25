@@ -6,10 +6,7 @@ const cors = require('cors');
 import bcrypt from "bcrypt";
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
-import dotenv from 'dotenv';
 
-
-dotenv.config({ path: ".env.local" });
 
 
 const app = express();
