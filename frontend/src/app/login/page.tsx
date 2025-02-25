@@ -4,18 +4,21 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation';
 import React, { FormEvent, useState } from 'react'
 import toast, { Toaster } from 'react-hot-toast';
+import { ClipLoader } from 'react-spinners';
 
 export default function Page() {
     const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
     const [loginEmail, setLoginEmail] = useState<string>('');
     const [loginPassword, setLoginPassword] = useState<string>('');
+    const [isLoading, setIsLoading] = useState<boolean>(false);
 
     const router = useRouter();
 
 
     const handleLogin = (e: FormEvent) => {
         e.preventDefault();
+        setIsLoading(true);
 
         axios.post(`${API_URL}/loginUser`, { email: loginEmail, password: loginPassword }, { withCredentials: true })
             .then((res) => {
@@ -27,6 +30,7 @@ export default function Page() {
                 toast.error(err.response.data.message);
                 console.log(err.response.data.message);
             })
+            .finally(() => setIsLoading(false));
     };;
 
 
@@ -108,12 +112,22 @@ export default function Page() {
                                     Forgot password?
                                 </a>
                             </div>
-                            <button
-                                type="submit"
-                                className="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
-                            >
-                                Sign in
-                            </button>
+                            {isLoading ? (
+                                <button
+                                    type="submit"
+                                    className="w-full py-1 text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                                    disabled
+                                >
+                                    <ClipLoader size={35} color='#ffffff' />
+                                </button>
+                            ) : (
+                                <button
+                                    type="submit"
+                                    className="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                                >
+                                    Sign in
+                                </button>
+                            )}
                             <p className="text-sm font-light text-gray-500 dark:text-gray-400">
                                 Dont have an account?
                                 <Link className='font-medium text-primary-600 hover:underline dark:text-primary-500' href={'/signup'}>

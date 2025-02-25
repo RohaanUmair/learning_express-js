@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation';
 import React, { FormEvent, useState } from 'react'
 import toast, { Toaster } from 'react-hot-toast';
+import { ClipLoader } from 'react-spinners';
 
 export default function SignupPage() {
     const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -11,12 +12,15 @@ export default function SignupPage() {
     const [signupUsername, setSignupUsername] = useState<string>('');
     const [signupEmail, setSignupEmail] = useState<string>('');
     const [signupPassword, setSignupPassword] = useState<string>('');
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+
 
     const router = useRouter();
 
 
     const handleFormSubmit = (e: FormEvent) => {
         e.preventDefault();
+        setIsLoading(true);
 
         axios.post(`${API_URL}/signupUser`, { username: signupUsername, email: signupEmail, password: signupPassword })
             .then((res) => {
@@ -27,6 +31,7 @@ export default function SignupPage() {
                 toast.error(err.response.data.message);
                 console.log(err.response.data.message);
             })
+            .finally(() => setIsLoading(false));
     };
 
 
@@ -101,12 +106,22 @@ export default function SignupPage() {
                                     minLength={6}
                                 />
                             </div>
-                            <button
-                                type="submit"
-                                className="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
-                            >
-                                Sign Up
-                            </button>
+                            {isLoading ? (
+                                <button
+                                    type="submit"
+                                    className="w-full py-1 text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                                    disabled
+                                >
+                                    <ClipLoader size={35} color='#ffffff' />
+                                </button>
+                            ) : (
+                                <button
+                                    type="submit"
+                                    className="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                                >
+                                    Sign Up
+                                </button>
+                            )}
                             <p className="text-sm font-light text-gray-500 dark:text-gray-400">
                                 Already have an Account?
                                 <Link className='font-medium text-primary-600 hover:underline dark:text-primary-500' href={'/login'}>
