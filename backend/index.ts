@@ -123,10 +123,22 @@ app.post('/signupUser', async (req: Request, res: Response) => {
     try {
         const { username, email, password } = req.body;
 
-        if(username.length < 4){
-            res.status(400).json({ message: 'User with this Email already exists' });
+        if (username.length < 4) {
+            res.status(400).json({ message: 'Username should be minimum of 4 characters' });
             return;
         }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            res.status(400).json({ error: "Invalid email" });
+            return;
+        }
+
+        if (password.length < 6) {
+            res.status(400).json({ message: 'Password too short' });
+            return;
+        }
+
 
         const userExistence = await User.findOne({ email });
         if (userExistence) {
@@ -157,6 +169,16 @@ app.post('/loginUser', async (req: Request, res: Response) => {
     try {
         const { email, password } = req.body;
 
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            res.status(400).json({ error: "Invalid email" });
+            return;
+        }
+
+        if (password.length < 6) {
+            res.status(400).json({ message: 'Password too short' });
+            return;
+        }
 
 
         const userExistence = await User.findOne({ email });

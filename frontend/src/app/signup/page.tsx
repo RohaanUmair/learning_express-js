@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import React, { FormEvent, useState } from 'react'
 import toast, { Toaster } from 'react-hot-toast';
 
-export default function page() {
+export default function SignupPage() {
     const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
     const [signupUsername, setSignupUsername] = useState<string>('');
@@ -61,6 +61,7 @@ export default function page() {
                                     required={true}
                                     value={signupUsername}
                                     onChange={(e) => setSignupUsername(e.target.value)}
+                                    minLength={4}
                                 />
                             </div>
                             <div>
@@ -79,7 +80,6 @@ export default function page() {
                                     required={true}
                                     value={signupEmail}
                                     onChange={(e) => setSignupEmail(e.target.value)}
-                                    // minLength={6}
                                 />
                             </div>
                             <div>
@@ -98,7 +98,7 @@ export default function page() {
                                     required={true}
                                     value={signupPassword}
                                     onChange={(e) => setSignupPassword(e.target.value)}
-                                    // minLength={6}
+                                    minLength={6}
                                 />
                             </div>
                             <button

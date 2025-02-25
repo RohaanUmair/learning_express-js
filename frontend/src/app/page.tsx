@@ -93,7 +93,7 @@ export default function Home() {
     axios.post(`${API_URL}/logout`, {}, { withCredentials: true })
       .then((res) => {
         console.log(res);
-        // router.push('/login');
+        router.push('/login');
       })
       .catch((err) => console.log(err));
   };

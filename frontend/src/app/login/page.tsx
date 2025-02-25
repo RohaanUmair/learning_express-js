@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import React, { FormEvent, useState } from 'react'
 import toast, { Toaster } from 'react-hot-toast';
 
-export default function page() {
+export default function Page() {
     const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
     const [loginEmail, setLoginEmail] = useState<string>('');
@@ -61,7 +61,6 @@ export default function page() {
                                     className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                     placeholder="name@company.com"
                                     required={true}
-                                    minLength={6}
                                 />
                             </div>
                             <div>
@@ -80,7 +79,7 @@ export default function page() {
                                     placeholder="••••••••"
                                     className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                     required={true}
-                                    // minLength={6}
+                                    minLength={6}
                                 />
                             </div>
                             <div className="flex items-center justify-between">
