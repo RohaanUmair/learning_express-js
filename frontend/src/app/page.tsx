@@ -46,8 +46,10 @@ export default function Home() {
     if (input.trim()) {
       const task = input.trim().toUpperCase();
       const toastId = toast.loading('Adding todo...');
-      axios.post(`${API_URL}/addTodo`, { task }, { withCredentials: true })
-        .then(() => getData())
+      const uniqueId = Math.round(Math.random() * 9999999999);
+
+      axios.post(`${API_URL}/addTodo`, { task, _id: uniqueId }, { withCredentials: true })
+        .then(() => setTodos((prev) => [...prev, { task, _id: uniqueId }]))
         .then(() => toast.success('Todo added successfully!', { id: toastId }))
         .catch((error) => {
           toast.error(`Failed to add todo: ${error.message}`, { id: toastId });
@@ -59,7 +61,7 @@ export default function Home() {
   const deleteTodo = (id: number) => {
     const toastId = toast.loading('Deleting todo...');
     axios.delete(`${API_URL}/delTodo`, { data: { _id: id } })
-      .then(() => getData())
+      .then(() => setTodos((prev) => prev.filter((todo) => todo._id !== id)))
       .then(() => toast.success('Todo deleted successfully!', { id: toastId }))
       .catch((error) => {
         toast.error(`Failed to delete todo: ${error.message}`, { id: toastId });
@@ -75,8 +77,12 @@ export default function Home() {
         _id: currentTodoId,
         updatedTask: editingTask.toUpperCase()
       })
-        .then(() => getData())
         .then(() => {
+          setTodos((prev) =>
+            prev.map((todo) =>
+              todo._id === currentTodoId ? { ...todo, task: editingTask.toUpperCase() } : todo
+            )
+          );
           toast.success('Todo updated successfully!', { id: toastId });
           setEditingTodoId(null);
         })

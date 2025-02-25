@@ -48,10 +48,11 @@ app.post('/addTodo', async (req: Request, res: Response) => {
         }
 
 
-        const { task } = req.body;
+        const { task, _id } = req.body;
         const newTask = new Todo({
             task,
-            userId: claims._id
+            userId: claims._id,
+            _id
         });
         await newTask.save();
 
