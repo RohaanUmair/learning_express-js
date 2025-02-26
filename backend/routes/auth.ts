@@ -82,17 +82,17 @@ router.post('/loginUser', async (req: Request, res: Response) => {
             return;
         }
 
-        const accessToken = jwt.sign({ _id: userExistence._id }, process.env.JWT_ACCESS_SECRET, { expiresIn: '1m' });
-        const refreshToken = jwt.sign({ _id: userExistence._id }, process.env.JWT_REFRESH_SECRET, { expiresIn: '5m' });
+        const accessToken = jwt.sign({ _id: userExistence._id }, process.env.JWT_ACCESS_SECRET, { expiresIn: '5m' });
+        const refreshToken = jwt.sign({ _id: userExistence._id }, process.env.JWT_REFRESH_SECRET, { expiresIn: '15m' });
 
         res.cookie('accessToken', accessToken, {
-            maxAge: 60000
+            maxAge: 300000
         });
 
         res.cookie('refreshToken', refreshToken, {
-            maxAge: 300000,
+            maxAge: 900000,
             httpOnly: true,
-            secure: true,
+            secure: process.env.NODE_ENV === "production",
             sameSite: 'strict'
         });
 
@@ -111,54 +111,6 @@ router.post('/logout', (req: Request, res: Response) => {
 
     res.json({ message: 'Logged out' });
 });
-
-
-
-
-function verifyUser(req: Request, res: Response, next: NextFunction) {
-    const accessToken = req.cookies.accessToken;
-
-    if (!accessToken) {
-        if (renewToken(req, res)) {
-            next();
-        }
-    } else {
-        const claims = jwt.verify(accessToken, process.env.JWT_ACCESS_SECRET);
-
-        if (!claims) {
-            res.status(401).json({ message: 'Invalid Token' });
-            return;
-        } else {
-            (req as any)._id = claims._id;
-            next();
-        }
-    }
-}
-
-function renewToken(req: Request, res: Response) {
-    const refreshToken = req.cookies.refreshToken;
-    let exist = false;
-
-    if (!refreshToken) {
-
-    } else {
-        const claims = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
-
-        if (!claims) {
-            res.status(401).json({ message: 'Invalid Token' });
-            return;
-        } else {
-            const accessToken = jwt.sign({ _id: claims._id }, process.env.JWT_ACCESS_SECRET, { expiresIn: '1m' });
-
-            res.cookie('accessToken', accessToken, {
-                maxAge: 60000
-            });
-
-            exist = true;
-        }
-    }
-    return exist;
-}
 
 
 export default router;
