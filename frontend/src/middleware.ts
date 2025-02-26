@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 
 export function middleware(req: NextRequest) {
-    const userId = req.cookies.get('jwt')?.value;
+    const refreshToken = req.cookies.get('refreshToken')?.value;
 
-    if (userId) {   
+    if (refreshToken) {   
         if (req.nextUrl.pathname === '/login' || req.nextUrl.pathname === '/signup') {
             return NextResponse.redirect(new URL('/', req.url));
         }
-    } else if (!userId) {
+    } else if (!refreshToken) {
         if (req.nextUrl.pathname === '/' || req.nextUrl.pathname === '/profile') {
             return NextResponse.redirect(new URL('/login', req.url));
         }

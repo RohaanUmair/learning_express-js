@@ -31,7 +31,7 @@ export default function Page() {
                 console.log(err.response.data.message);
             })
             .finally(() => setIsLoading(false));
-    };;
+    };
 
 
     return (

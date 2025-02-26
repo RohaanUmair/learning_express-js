@@ -26,6 +26,7 @@ export default function SignupPage() {
             .then((res) => {
                 console.log(res);
                 router.push('/login');
+                toast.success(`${res.data.message} Login Now`);
             })
             .catch((err) => {
                 toast.error(err.response.data.message);

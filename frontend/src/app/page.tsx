@@ -76,7 +76,7 @@ export default function Home() {
       axios.put(`${API_URL}/editTodo`, {
         _id: currentTodoId,
         updatedTask: editingTask.toUpperCase()
-      })
+      }, { withCredentials: true })
         .then(() => {
           setTodos((prev) =>
             prev.map((todo) =>

@@ -1,4 +1,4 @@
-import express, { Request, Response } from "express";
+import express, { NextFunction, Request, Response } from "express";
 import User from "../models/UserSchema";
 import bcrypt from "bcrypt";
 const jwt = require('jsonwebtoken');
@@ -82,27 +82,83 @@ router.post('/loginUser', async (req: Request, res: Response) => {
             return;
         }
 
-        const token = jwt.sign({ _id: userExistence._id }, process.env.JWT_SECRET);
+        const accessToken = jwt.sign({ _id: userExistence._id }, process.env.JWT_ACCESS_SECRET, { expiresIn: '1m' });
+        const refreshToken = jwt.sign({ _id: userExistence._id }, process.env.JWT_REFRESH_SECRET, { expiresIn: '5m' });
 
-        res.cookie('jwt', token, {
-            httpOnly: true,
-            sameSite: 'lax',
-            maxAge: 1000 * 60 * 60
+        res.cookie('accessToken', accessToken, {
+            maxAge: 60000
         });
 
-        res.status(200).json({ message: 'Logged In Successfully' });
+        res.cookie('refreshToken', refreshToken, {
+            maxAge: 300000,
+            httpOnly: true,
+            secure: true,
+            sameSite: 'strict'
+        });
+
+
+        res.status(200).json({ Login: true, message: 'Logged In Successfully' });
     } catch (error) {
-        res.status(500).json({ error: 'Internal Sevrer Error' });
+        res.status(500).json({ Login: false, error: 'Internal Server Error' });
     }
 });
 
 
 
 router.post('/logout', (req: Request, res: Response) => {
-    res.cookie('jwt', '', { maxAge: 0 });
+    res.cookie('accessToken', '', { maxAge: 0 });
+    res.cookie('refreshToken', '', { maxAge: 0 });
 
     res.json({ message: 'Logged out' });
 });
+
+
+
+
+function verifyUser(req: Request, res: Response, next: NextFunction) {
+    const accessToken = req.cookies.accessToken;
+
+    if (!accessToken) {
+        if (renewToken(req, res)) {
+            next();
+        }
+    } else {
+        const claims = jwt.verify(accessToken, process.env.JWT_ACCESS_SECRET);
+
+        if (!claims) {
+            res.status(401).json({ message: 'Invalid Token' });
+            return;
+        } else {
+            (req as any)._id = claims._id;
+            next();
+        }
+    }
+}
+
+function renewToken(req: Request, res: Response) {
+    const refreshToken = req.cookies.refreshToken;
+    let exist = false;
+
+    if (!refreshToken) {
+
+    } else {
+        const claims = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+
+        if (!claims) {
+            res.status(401).json({ message: 'Invalid Token' });
+            return;
+        } else {
+            const accessToken = jwt.sign({ _id: claims._id }, process.env.JWT_ACCESS_SECRET, { expiresIn: '1m' });
+
+            res.cookie('accessToken', accessToken, {
+                maxAge: 60000
+            });
+
+            exist = true;
+        }
+    }
+    return exist;
+}
 
 
 export default router;
