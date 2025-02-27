@@ -3,7 +3,11 @@ import Todo from "../models/TodoSchema";
 const jwt = require('jsonwebtoken');
 
 const router = express.Router();
-// router.use(verifyUser);
+
+
+router.get('/protected-route', verifyUser, (req: Request, res: Response) => {
+    res.json({ message: 'You are authenticated!' });
+});
 
 router.post('/addTodo', async (req: Request, res: Response) => {
     console.log('ADD TODO')
@@ -130,9 +134,18 @@ function renewToken(req: Request, res: Response) {
             return;
         } else {
             const accessToken = jwt.sign({ _id: claims._id }, process.env.JWT_ACCESS_SECRET, { expiresIn: '5m' });
+            const refreshToken = jwt.sign({ _id: claims._id }, process.env.JWT_REFRESH_SECRET, { expiresIn: '15m' });
+
 
             res.cookie('accessToken', accessToken, {
                 maxAge: 300000
+            });
+
+            res.cookie('refreshToken', refreshToken, {
+                maxAge: 900000,
+                httpOnly: true,
+                secure: process.env.NODE_ENV === "production",
+                sameSite: 'strict'
             });
 
             exist = true;
