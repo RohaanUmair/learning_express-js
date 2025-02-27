@@ -9,11 +9,14 @@ import todosRoutes from './routes/todo';
 
 const app = express();
 app.use(cors({
-    origin: 'https://learning-express-js.vercel.app',
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    origin: ['https://learning-express-js.vercel.app', 'http://localhost:3000'],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization", 'accessToken', 'refreshToken'],
     credentials: true
 }));
+
+app.options('*', cors());
+
 app.use(express.json());
 app.use(cookieParser());
 app.use(authRoutes);
