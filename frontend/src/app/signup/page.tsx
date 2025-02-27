@@ -22,7 +22,7 @@ export default function SignupPage() {
         e.preventDefault();
         setIsLoading(true);
 
-        axios.post(`${API_URL}/signupUser`, { username: signupUsername, email: signupEmail, password: signupPassword })
+        axios.post(`${API_URL}/signupUser`, { username: signupUsername, email: signupEmail, password: signupPassword }, { withCredentials: true })
             .then((res) => {
                 console.log(res);
                 router.push('/login');

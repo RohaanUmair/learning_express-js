@@ -12,13 +12,14 @@ interface Todo {
 }
 
 export default function Home() {
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
+  
   useEffect(() => {
     fetch(`${API_URL}/protected-route`, { credentials: 'include' })
       .then(() => getData())
   }, []);
 
 
-  const API_URL = process.env.NEXT_PUBLIC_API_URL;
   const [todos, setTodos] = useState<Todo[]>([]);
   const [input, setInput] = useState('');
   const [isDarkMode, setIsDarkMode] = useState(false);
