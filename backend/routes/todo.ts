@@ -139,7 +139,8 @@ function renewToken(req: Request, res: Response) {
 
             res.cookie("accessToken", accessToken, {
                 maxAge: 300000,
-                httpOnly: true,
+                // httpOnly: true,
+                httpOnly: false,
                 // secure: process.env.NODE_ENV === "production",
                 secure: true,
                 sameSite: "none",
@@ -147,7 +148,8 @@ function renewToken(req: Request, res: Response) {
     
             res.cookie("refreshToken", refreshToken, {
                 maxAge: 900000,
-                httpOnly: true,
+                httpOnly: false,
+                // httpOnly: true,
                 // secure: process.env.NODE_ENV === "production",
                 secure: true,
                 sameSite: "none",
