@@ -1,6 +1,6 @@
 import express, { NextFunction, Request, Response } from "express";
 import User from "../models/UserSchema";
-import bcrypt from "bcrypt";
+import bcrypt from 'bcryptjs';
 const jwt = require('jsonwebtoken');
 
 

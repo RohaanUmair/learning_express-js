@@ -11,7 +11,7 @@ const app = express();
 app.use(cors({
     origin: ['https://learning-express-js.vercel.app', 'http://localhost:3000'],
     methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization", 'accessToken', 'refreshToken', 'Access-Control-Allow-Origin'],
+    allowedHeaders: ["Content-Type", "Authorization", 'accessToken', 'refreshToken', 'Access-Control-Allow-Origin   '],
     credentials: true
 }));
 
