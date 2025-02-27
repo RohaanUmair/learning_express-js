@@ -85,23 +85,23 @@ router.post('/loginUser', async (req: Request, res: Response) => {
         const accessToken = jwt.sign({ _id: userExistence._id }, process.env.JWT_ACCESS_SECRET, { expiresIn: '5m' });
         const refreshToken = jwt.sign({ _id: userExistence._id }, process.env.JWT_REFRESH_SECRET, { expiresIn: '15m' });
 
-        res.cookie("accessToken", accessToken, {
-            maxAge: 300000,
-            httpOnly: false,
-            // secure: true,
-            // sameSite: 'none'
-        });
+        // res.cookie("accessToken", accessToken, {
+        //     maxAge: 300000,
+        //     httpOnly: true,
+        //     secure: true,
+        //     sameSite: 'none'
+        // });
 
-        res.cookie("refreshToken", refreshToken, {
-            maxAge: 900000,
-            httpOnly: false,
-            // secure: true,
-            // sameSite: "none",
-        });
+        // res.cookie("refreshToken", refreshToken, {
+        //     maxAge: 900000,
+        //     httpOnly: true,
+        //     secure: true,
+        //     sameSite: "none",
+        // });
 
 
 
-        res.status(200).json({ Login: true, message: 'Logged In Successfully' });
+        res.status(200).json({ Login: true, message: 'Logged In Successfully', accessToken, refreshToken });
     } catch (error) {
         res.status(500).json({ Login: false, error: 'Internal Server Error' });
     }

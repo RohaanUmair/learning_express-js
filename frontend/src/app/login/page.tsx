@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import React, { FormEvent, useState } from 'react'
 import toast, { Toaster } from 'react-hot-toast';
 import { ClipLoader } from 'react-spinners';
+import Cookies from 'js-cookie';
 
 export default function Page() {
     const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -25,6 +26,8 @@ export default function Page() {
                 console.log(res);
                 toast.success(res.data.message);
                 router.push('/');
+                Cookies.set('accessToken', res.data.accessToken)
+                Cookies.set('refreshToken', res.data.refreshToken)
             })
             .catch((err) => {
                 toast.error(err.response.data.message);
