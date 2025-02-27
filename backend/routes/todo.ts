@@ -137,15 +137,18 @@ function renewToken(req: Request, res: Response) {
             const refreshToken = jwt.sign({ _id: claims._id }, process.env.JWT_REFRESH_SECRET, { expiresIn: '15m' });
 
 
-            res.cookie('accessToken', accessToken, {
-                maxAge: 300000
+            res.cookie("accessToken", accessToken, {
+                maxAge: 300000,
+                httpOnly: true,
+                secure: process.env.NODE_ENV === "production",
+                sameSite: "none",
             });
-
-            res.cookie('refreshToken', refreshToken, {
+    
+            res.cookie("refreshToken", refreshToken, {
                 maxAge: 900000,
                 httpOnly: true,
                 secure: process.env.NODE_ENV === "production",
-                sameSite: 'strict'
+                sameSite: "none",
             });
 
             exist = true;
