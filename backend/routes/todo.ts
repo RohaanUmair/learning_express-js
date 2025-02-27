@@ -140,14 +140,16 @@ function renewToken(req: Request, res: Response) {
             res.cookie("accessToken", accessToken, {
                 maxAge: 300000,
                 httpOnly: true,
-                secure: process.env.NODE_ENV === "production",
+                // secure: process.env.NODE_ENV === "production",
+                secure: true,
                 sameSite: "none",
             });
     
             res.cookie("refreshToken", refreshToken, {
                 maxAge: 900000,
                 httpOnly: true,
-                secure: process.env.NODE_ENV === "production",
+                // secure: process.env.NODE_ENV === "production",
+                secure: true,
                 sameSite: "none",
             });
 

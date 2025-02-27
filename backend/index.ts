@@ -12,7 +12,7 @@ app.use(cors({
     origin: ['https://learning-express-js.vercel.app', 'http://localhost:3000'],
     // origin: '*',
     methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: "Content-Type",
+    allowedHeaders: ["Content-Type"],
     credentials: true
 }));
 
