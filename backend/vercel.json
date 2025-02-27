@@ -8,7 +8,14 @@
     ],
     "routes": [
         {
-            "src": "/(.*)",
+            "src": "/.*",
+            "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+            "headers": {
+                "Access-Control-Allow-Origin": "https://learning-express-js.vercel.app",
+                "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+                "Access-Control-Allow-Headers": "Content-Type, Authorization",
+                "Access-Control-Allow-Credentials": "true"
+            },
             "dest": "index.ts"
         }
     ]
