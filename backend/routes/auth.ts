@@ -89,14 +89,14 @@ router.post('/loginUser', async (req: Request, res: Response) => {
             maxAge: 300000,
             httpOnly: false,
             // secure: true,
-            sameSite: 'none'
+            // sameSite: 'none'
         });
 
         res.cookie("refreshToken", refreshToken, {
             maxAge: 900000,
             httpOnly: false,
-            secure: true,
-            sameSite: "none",
+            // secure: true,
+            // sameSite: "none",
         });
 
 
