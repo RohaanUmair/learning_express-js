@@ -9,9 +9,9 @@ import todosRoutes from './routes/todo';
 
 const app = express();
 app.use(cors({
-    origin: ['https://learning-express-js.vercel.app', 'http://localhost:3000'],
+    origin: 'https://learning-express-js.vercel.app',
     methods: "GET,POST,PUT,DELETE",
-    allowedHeaders: "Content-Type",
+    allowedHeaders: "Content-Type, Authorization",
     credentials: true
 }));
 app.use(express.json());
